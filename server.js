@@ -5,10 +5,11 @@ const db = require("./models");
 const app = express();
 const PORT = process.env.PORT;
 
-const userRoutes = require("./routes/userRoutes");
 app.use(express.json());
-app.use(cors());
 
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }));
+
+const userRoutes = require("./routes/userRoutes");
 app.use("/user", userRoutes);
 
 db.sequelize.sync().then(() => {
