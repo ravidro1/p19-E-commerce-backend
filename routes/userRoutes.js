@@ -7,7 +7,9 @@ const {
   login,
   refreshToken,
   logout,
+  getUserInfo,
 } = require("../controllers/userController");
+const { User } = require("../models");
 
 const jwtVerify = (req, res, next) => {
   try {
@@ -38,12 +40,14 @@ router.post("/sign-up", sigUp);
 router.post("/login", login);
 router.get("/logout", logout);
 router.get("/refresh-token", refreshToken);
-router.get("/isTokenValid", jwtVerify, (req, res) => {
-  res.status(200).json({ message: "TokenValid" });
+router.get("/get-user-info", jwtVerify, getUserInfo);
+router.get("/", async (req, res) => {
+  const userFunc = await User.findByPk(1);
+  res.send(userFunc.getFullName());
 });
 
-router.get("/test", jwtVerify, (req, res) => {
-  res.status(200).json({ message: "test-success" });
+router.get("/isTokenValid", jwtVerify, (req, res) => {
+  res.status(200).json({ message: "TokenValid" });
 });
 
 module.exports = router;

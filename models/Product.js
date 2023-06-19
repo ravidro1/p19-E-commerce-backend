@@ -1,16 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define("User", {
-    email: {
+  const Product = sequelize.define("Product", {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
         notEmpty: true,
-        is: /^[a-zA-z0-9.-]+@([a-zA-z]+.)+[a-zA-z]{2,4}$/,
-        // isEmail: true,
       },
     },
-    password: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false,
 
@@ -18,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    firstName: {
+    picURL: {
       type: DataTypes.STRING,
       allowNull: false,
 
@@ -26,20 +24,26 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-
-    lastName: {
-      type: DataTypes.STRING,
+    price: {
+      type: DataTypes.INTEGER,
       allowNull: false,
 
       validate: {
         notEmpty: true,
       },
     },
+
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+
+      validate: {
+        notEmpty: true,
+      },
+    },
+    // numberOfRaters: {},
   });
 
-  User.prototype.getFullName = function () {
-    return this.firstName + " " + this.lastName;
-  };
-
-  return User;
+  return Product;
 };

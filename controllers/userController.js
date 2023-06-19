@@ -75,8 +75,6 @@ exports.login = async (req, res) => {
     );
     const { access_token, refresh_token } = createToken(user.id);
 
-    // res.setHeader("Set-Cookie", "d=wdadwdaaw");
-    // res.send("Set-Cookie");
     res
       .status(200)
       .cookie("refresh_token", refresh_token, {
@@ -123,6 +121,23 @@ exports.refreshToken = async (req, res) => {
     res
       .status(200)
       .json({ message: "Token Refresh", newAccessToken: access_token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const userID = req.userID;
+
+    const user = await User.findByPk(userID);
+    if (!user) return res.status(400).json({ message: "User Not Found" });
+    res
+      .status(200)
+      .json({
+        message: "User Found",
+        user: { firstName: user.firstName, lastName: user.lastName },
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
