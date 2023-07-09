@@ -35,6 +35,14 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   });
 
   User.prototype.getFullName = function () {

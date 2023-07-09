@@ -10,16 +10,16 @@ const validatePassword = (password, verifyPassword) => {
 };
 
 // [userID]
-const createToken = (userID) => {
+const createToken = (userID, isAdmin) => {
   const access_token = jsonwebtoken.sign(
-    { user_id: userID },
+    { user_id: userID, isAdmin },
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: "1h",
     }
   );
   const refresh_token = jsonwebtoken.sign(
-    { user_id: userID },
+    { user_id: userID, isAdmin },
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "80d",
@@ -29,7 +29,7 @@ const createToken = (userID) => {
 };
 
 // [email, password, verifyPassword,firstName,lastName]
-exports.sigUp = async (req, res) => {
+exports.signUp = async (req, res) => {
   try {
     const { email, password, verifyPassword, firstName, lastName } = req.body;
 
@@ -41,13 +41,48 @@ exports.sigUp = async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const user = await User.create({
       email: email,
       password: hashPassword,
       firstName,
       lastName,
     });
-    res.status(201).json({ message: "success" });
+
+    const { access_token } = createToken(user.id, user.isAdmin);
+
+    res.status(201).json({ message: "success", token: access_token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// [email, password, verifyPassword,firstName,lastName,adminCode]
+exports.adminSignUp = async (req, res) => {
+  try {
+    const { email, password, verifyPassword, firstName, lastName, adminCode } =
+      req.body;
+    if (adminCode != 123456)
+      return res.status(400).json({ message: "Admin code incorrect" });
+
+    if (!validatePassword(password, verifyPassword))
+      return res.status(400).json({
+        message:
+          "Password And VerifyPassword Must Match And The Length Need To Be More Then 8 Char And Less Then 20 Char",
+      });
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      email: email,
+      password: hashPassword,
+      firstName,
+      lastName,
+      isAdmin: true,
+    });
+
+    const { access_token } = createToken(user.id, user.isAdmin);
+
+    res.status(201).json({ message: "success", token: access_token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -68,12 +103,7 @@ exports.login = async (req, res) => {
     );
     if (!bcryptPassword)
       return res.status(400).json({ message: "Password Incorrect" });
-    console.log(
-      user.id,
-      process.env.ACCESS_TOKEN_SECRET,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-    const { access_token, refresh_token } = createToken(user.id);
+    const { access_token, refresh_token } = createToken(user.id, user.isAdmin);
 
     res
       .status(200)
@@ -117,7 +147,10 @@ exports.refreshToken = async (req, res) => {
     if (!verifyRefreshToken)
       return res.status(401).json({ message: "Invalid Refresh Token" });
 
-    const { access_token } = createToken(verifyRefreshToken.user_id);
+    const { access_token } = createToken(
+      verifyRefreshToken.user_id,
+      verifyRefreshToken.isAdmin
+    );
     res
       .status(200)
       .json({ message: "Token Refresh", newAccessToken: access_token });
@@ -129,15 +162,21 @@ exports.refreshToken = async (req, res) => {
 exports.getUserInfo = async (req, res) => {
   try {
     const userID = req.userID;
-
+    const isAdmin = req.isAdmin;
     const user = await User.findByPk(userID);
-    if (!user) return res.status(400).json({ message: "User Not Found" });
-    res
-      .status(200)
-      .json({
-        message: "User Found",
-        user: { firstName: user.firstName, lastName: user.lastName },
-      });
+    if (!user)
+      return res
+        .status(400)
+        .clearCookie("refresh_token")
+        .json({ message: "User Not Found" });
+    res.status(200).json({
+      message: "User Found",
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isAdmin,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

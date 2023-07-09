@@ -3,7 +3,8 @@ const router = express.Router();
 const jsonwebtoken = require("jsonwebtoken");
 
 const {
-  sigUp,
+  signUp,
+  adminSignUp,
   login,
   refreshToken,
   logout,
@@ -26,6 +27,7 @@ const jwtVerify = (req, res, next) => {
             res.status(401).json({ message: "Token Wrong" });
           } else {
             req.userID = decoded.user_id;
+            req.isAdmin = decoded.isAdmin;
             next();
           }
         }
@@ -36,11 +38,13 @@ const jwtVerify = (req, res, next) => {
   }
 };
 
-router.post("/sign-up", sigUp);
+router.post("/sign-up", signUp);
+router.post("/admin-sign-up", adminSignUp);
 router.post("/login", login);
 router.get("/logout", logout);
 router.get("/refresh-token", refreshToken);
 router.get("/get-user-info", jwtVerify, getUserInfo);
+
 router.get("/", async (req, res) => {
   const userFunc = await User.findByPk(1);
   res.send(userFunc.getFullName());
