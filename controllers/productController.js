@@ -1,9 +1,9 @@
 const { Product } = require("../models");
 
-// [name, description, picURL, price, rating]
+// [name, description, picURL, price,quantity]
 exports.create = async (req, res) => {
   try {
-    const { name, description, picURL, price, rating } = req.body;
+    const { name, description, picURL, price, quantity } = req.body;
 
     console.log(req.body);
     const product = await Product.create({
@@ -11,7 +11,7 @@ exports.create = async (req, res) => {
       description,
       picURL,
       price,
-      rating,
+      quantity,
     });
     if (!product)
       return res.status(400).json({ message: "Product Creation Fail" });
@@ -20,3 +20,7 @@ exports.create = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getAll = (req, res) => {};
+exports.update = (req, res) => {};
+exports.delete = (req, res) => {};

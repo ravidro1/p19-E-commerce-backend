@@ -13,23 +13,27 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
 
       validate: {
-        notEmpty: true,
+        // notEmpty: true,
       },
     },
     picURL: {
       type: DataTypes.STRING,
-      allowNull: false,
-
-      validate: {
-        notEmpty: true,
-      },
     },
     price: {
       type: DataTypes.INTEGER,
       allowNull: false,
 
       validate: {
+        // notEmpty: true,
+      },
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
         notEmpty: true,
+        min: 0,
       },
     },
 
@@ -40,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
 
       validate: {
         notEmpty: true,
+        min: 0,
       },
     },
     // numberOfRaters: {},

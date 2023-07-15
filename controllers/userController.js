@@ -50,7 +50,14 @@ exports.signUp = async (req, res) => {
 
     const { access_token } = createToken(user.id, user.isAdmin);
 
-    res.status(201).json({ message: "success", token: access_token });
+    res
+      .status(201)
+      .cookie("refresh_token", refresh_token, {
+        maxAge: 900000,
+        expires: new Date(Date.now() + 900000),
+        httpOnly: true,
+      })
+      .json({ message: "success", token: access_token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -82,7 +89,14 @@ exports.adminSignUp = async (req, res) => {
 
     const { access_token } = createToken(user.id, user.isAdmin);
 
-    res.status(201).json({ message: "success", token: access_token });
+    res
+      .status(201)
+      .cookie("refresh_token", refresh_token, {
+        maxAge: 900000,
+        expires: new Date(Date.now() + 900000),
+        httpOnly: true,
+      })
+      .json({ message: "success", token: access_token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -165,10 +179,12 @@ exports.getUserInfo = async (req, res) => {
     const isAdmin = req.isAdmin;
     const user = await User.findByPk(userID);
     if (!user)
-      return res
-        .status(400)
-        .clearCookie("refresh_token")
-        .json({ message: "User Not Found" });
+      return (
+        res
+          .status(400)
+          // .clearCookie("refresh_token")
+          .json({ message: "User Not Found" })
+      );
     res.status(200).json({
       message: "User Found",
       user: {
