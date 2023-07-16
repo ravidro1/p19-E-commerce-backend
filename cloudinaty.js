@@ -9,12 +9,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = async (imageBase64, movie_id) => {
+const folderName = "e-commerce";
+
+const uploadImage = async (imageBase64, product_id) => {
   try {
     const res = await cloudinary.uploader.upload(imageBase64, {
       unique_filename: true,
-      //   filename_override: name,
-      public_id: movie_id,
+      public_id: product_id,
+      folder: folderName,
     });
     return res.url;
   } catch (error) {
@@ -23,9 +25,11 @@ const uploadImage = async (imageBase64, movie_id) => {
   }
 };
 
-const deleteImage = async (movie_id) => {
+const deleteImage = async (product_id) => {
   try {
-    const res = await cloudinary.uploader.destroy(movie_id);
+    const res = await cloudinary.uploader.destroy(
+      `${folderName}/${product_id}`
+    );
     return res;
   } catch (error) {
     console.log(error);

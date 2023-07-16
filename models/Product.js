@@ -10,44 +10,31 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
-
-      validate: {
-        // notEmpty: true,
-      },
     },
     picURL: {
       type: DataTypes.STRING,
     },
     price: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-
-      validate: {
-        // notEmpty: true,
-      },
+      defaultValue: 0,
     },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
       validate: {
-        notEmpty: true,
         min: 0,
       },
     },
 
     rating: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
+      defaultValue: null,
 
       validate: {
-        notEmpty: true,
         min: 0,
       },
     },
-    // numberOfRaters: {},
   });
 
   return Product;
